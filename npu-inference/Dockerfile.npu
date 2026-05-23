@@ -1,0 +1,19 @@
+FROM torizon/tensorflow-lite-imx8:4 AS base
+
+WORKDIR /app
+
+# Step 1: Get pip, pil, and numpy from Debian
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-pil \
+    python3-numpy \
+    && rm -rf /var/lib/apt/lists/*
+
+# Step 2: Get tflite-runtime from Python
+RUN pip3 install tflite-runtime --break-system-packages
+
+COPY mobilenet_v1_1.0_224_quant.tflite .
+COPY labels.txt .
+COPY run_inference_npu.py .
+
+CMD ["python3", "run_inference_npu.py", "test_image.jpg"]
